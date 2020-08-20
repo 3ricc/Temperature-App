@@ -8,6 +8,6 @@ const City = ({ city }) =>{
             <h3>{city}</h3>
         </div>
     )
-} // testing shit
+} // one more time
 
 export default City;
