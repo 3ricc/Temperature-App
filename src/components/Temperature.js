@@ -1,13 +1,12 @@
 import React from 'react';
 
-const Temperature = ({ temperature }) => {
-    if (!temperature) return null;
+const Temperature = ({ state } ) => {
+    if (!state.temperature) return null;
 
     return(
-        console.log({temperature}),
         
         <div>
-            <p>Temperature is {temperature} degrees celcius.</p>
+            <p>Temperature is {state.temperature} degrees {state.type}.</p>
         </div>
     )
 }

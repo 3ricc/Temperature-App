@@ -24088,23 +24088,36 @@ var Search = /*#__PURE__*/function (_Component) {
     _this = _super.call.apply(_super, [this].concat(args));
 
     _defineProperty(_assertThisInitialized(_this), "state", {
-      cityQuery: ''
+      cityQuery: '',
+      type: 'f'
     });
 
     _defineProperty(_assertThisInitialized(_this), "updateCityQuery", function (event) {
       _this.setState({
-        cityQuery: event.target.value
+        cityQuery: event.target.value,
+        type: _this.state.type
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "updateTypeQuery", function () {
+      _this.setState({
+        cityQuery: _this.state.cityQuery,
+        type: document.getElementById("type").value
       });
     });
 
     _defineProperty(_assertThisInitialized(_this), "handleKeyPress", function (event) {
       if (event.key == 'Enter') {
+        _this.updateTypeQuery();
+
         _this.searchCity();
       }
     });
 
     _defineProperty(_assertThisInitialized(_this), "searchCity", function () {
-      _this.props.searchCity(_this.state.cityQuery);
+      _this.props.searchCity(_this.state);
+
+      console.log(_this.state);
     });
 
     return _this;
@@ -24117,7 +24130,15 @@ var Search = /*#__PURE__*/function (_Component) {
         onChange: this.updateCityQuery,
         onKeyPress: this.handleKeyPress,
         placeholder: "Search for a city"
-      }), /*#__PURE__*/_react.default.createElement("button", {
+      }), /*#__PURE__*/_react.default.createElement("select", {
+        name: "temptype",
+        id: "type",
+        onChange: this.updateTypeQuery
+      }, /*#__PURE__*/_react.default.createElement("option", {
+        value: "f"
+      }, "Fahrenheit"), /*#__PURE__*/_react.default.createElement("option", {
+        value: "c"
+      }, "Celsius")), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("button", {
         onClick: this.searchCity
       }, "Search"));
     }
@@ -24162,11 +24183,9 @@ var _react = _interopRequireDefault(require("react"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Temperature = function Temperature(_ref) {
-  var temperature = _ref.temperature;
-  if (!temperature) return null;
-  return console.log({
-    temperature: temperature
-  }), /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("p", null, "Temperature is ", temperature, " degrees celcius."));
+  var state = _ref.state;
+  if (!state.temperature) return null;
+  return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("p", null, "Temperature is ", state.temperature, " degrees ", state.type, "."));
 };
 
 var _default = Temperature;
@@ -24217,9 +24236,9 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var API_ADDRESS1 = 'https://api.openweathermap.org/data/2.5/weather?q='; // half of the api key
+var WEATHER_API1 = 'https://api.openweathermap.org/data/2.5/weather?q='; // half of the api key
 
-var API_ADDRESS2 = '&appid=fa7959c2fce14f00abc5fb86df87cf5a'; // second half of the api key
+var WEATHER_API2 = '&appid=fa7959c2fce14f00abc5fb86df87cf5a'; // second half of the api key
 
 var TEST_ADDRESS = 'http://api.openweathermap.org/data/2.5/weather?q=London&appid=fa7959c2fce14f00abc5fb86df87cf5a'; // debugging purposes
 
@@ -24241,23 +24260,34 @@ var App = /*#__PURE__*/function (_Component) {
 
     _defineProperty(_assertThisInitialized(_this), "state", {
       city: null,
-      temperature: null
+      temperature: null,
+      type: null
     });
 
-    _defineProperty(_assertThisInitialized(_this), "searchCity", function (cityQuery) {
-      fetch("".concat(API_ADDRESS1).concat(cityQuery).concat(API_ADDRESS2)).then(function (response) {
+    _defineProperty(_assertThisInitialized(_this), "invokeWeatherAPI", function (data) {
+      fetch("".concat(WEATHER_API1).concat(data.cityQuery).concat(WEATHER_API2)).then(function (response) {
         return response.json();
       }).then(function (json) {
         var city = json.name;
-        var temperature = parseInt(json.main.temp) - 273;
+        var temperature = parseFloat(json.main.temp);
+        var type = data.type;
+
+        if (type == 'f') {
+          temperature = temperature * 9 / 5 - 459.67;
+          type = 'Fahrenheit';
+        } else {
+          temperature -= 273.15;
+          type = 'Celcius';
+        }
+
+        temperature = temperature.toFixed(2);
 
         _this.setState({
           city: city,
-          temperature: temperature
+          temperature: temperature,
+          type: type
         });
-      }).catch(function (err) {
-        return alert("No city found");
-      });
+      }); //.catch(err => alert("No city found"))
     });
 
     return _this;
@@ -24266,13 +24296,13 @@ var App = /*#__PURE__*/function (_Component) {
   _createClass(App, [{
     key: "render",
     value: function render() {
-      console.log('this.state', this.state);
+      console.log('this.state', this.state.type);
       return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("h2", null, "Temperature Finder"), /*#__PURE__*/_react.default.createElement(_Search.default, {
-        searchCity: this.searchCity
+        searchCity: this.invokeWeatherAPI
       }), /*#__PURE__*/_react.default.createElement(_City.default, {
         city: this.state.city
       }), /*#__PURE__*/_react.default.createElement(_Temperature.default, {
-        temperature: this.state.temperature
+        state: this.state
       }));
     }
   }]);
