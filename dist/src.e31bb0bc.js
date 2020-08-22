@@ -24071,6 +24071,9 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+var WEATHER_API1 = 'https://api.openweathermap.org/data/2.5/weather?appid=fa7959c2fce14f00abc5fb86df87cf5a&q=';
+var TEST_ADDRESS = 'http://api.openweathermap.org/data/2.5/weather?appid=fa7959c2fce14f00abc5fb86df87cf5a&q=London'; // debugging purposes
+
 var Search = /*#__PURE__*/function (_Component) {
   _inherits(Search, _Component);
 
@@ -24089,7 +24092,37 @@ var Search = /*#__PURE__*/function (_Component) {
 
     _defineProperty(_assertThisInitialized(_this), "state", {
       cityQuery: '',
-      type: 'f'
+      type: 'Fahrenheit'
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "invokeWeatherAPI", function (data) {
+      fetch("".concat(WEATHER_API1).concat(_this.state.cityQuery)).then(function (response) {
+        return response.json();
+      }).then(function (json) {
+        var city = json.name;
+        var temperature = parseFloat(json.main.temp);
+        var type = data.type;
+
+        if (type == 'Fahrenheit') {
+          temperature = temperature * 9 / 5 - 459.67;
+        } else {
+          temperature -= 273.15;
+        }
+
+        temperature = temperature.toFixed(2);
+
+        _this.props.sendData({
+          city: city,
+          temperature: temperature,
+          type: type
+        });
+      }).catch(function (err) {
+        return alert("No city found");
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "searchCity", function () {
+      _this.invokeWeatherAPI(_this.state);
     });
 
     _defineProperty(_assertThisInitialized(_this), "updateCityQuery", function (event) {
@@ -24107,17 +24140,11 @@ var Search = /*#__PURE__*/function (_Component) {
     });
 
     _defineProperty(_assertThisInitialized(_this), "handleKeyPress", function (event) {
-      if (event.key == 'Enter') {
-        _this.updateTypeQuery();
-
-        _this.searchCity();
-      }
-    });
-
-    _defineProperty(_assertThisInitialized(_this), "searchCity", function () {
-      _this.props.searchCity(_this.state);
-
       console.log(_this.state);
+
+      if (event.key == 'Enter') {
+        _this.invokeWeatherAPI(_this.state);
+      }
     });
 
     return _this;
@@ -24135,9 +24162,9 @@ var Search = /*#__PURE__*/function (_Component) {
         id: "type",
         onChange: this.updateTypeQuery
       }, /*#__PURE__*/_react.default.createElement("option", {
-        value: "f"
+        value: "Fahrenheit"
       }, "Fahrenheit"), /*#__PURE__*/_react.default.createElement("option", {
-        value: "c"
+        value: "Celcius"
       }, "Celsius")), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("button", {
         onClick: this.searchCity
       }, "Search"));
@@ -24190,6 +24217,148 @@ var Temperature = function Temperature(_ref) {
 
 var _default = Temperature;
 exports.default = _default;
+},{"react":"../node_modules/react/index.js"}],"components/Geolocation.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _react = _interopRequireWildcard(require("react"));
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var API_ADDRESS1 = 'https://api.openweathermap.org/data/2.5/weather?appid=fa7959c2fce14f00abc5fb86df87cf5a&lat=';
+
+var Geolocation = /*#__PURE__*/function (_Component) {
+  _inherits(Geolocation, _Component);
+
+  var _super = _createSuper(Geolocation);
+
+  function Geolocation() {
+    var _this;
+
+    _classCallCheck(this, Geolocation);
+
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    _this = _super.call.apply(_super, [this].concat(args));
+
+    _defineProperty(_assertThisInitialized(_this), "state", {
+      lat: '',
+      lng: '',
+      canLocate: true,
+      city: '',
+      temp: ''
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "findCity", function () {
+      fetch("".concat(API_ADDRESS1).concat(_this.state.lat, "&lon=").concat(_this.state.lng)).then(function (response) {
+        return response.json();
+      }).then(function (json) {
+        var city = json.name;
+        var temperature = parseFloat(json.main.temp);
+        temperature -= 273.15;
+        temperature = temperature.toFixed(2);
+
+        _this.setState({
+          lat: _this.state.lat,
+          lng: _this.state.lng,
+          canLocate: true,
+          city: city,
+          temp: temperature
+        });
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "setLocation", function (position) {
+      _this.setState({
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+        canLocate: true,
+        city: '',
+        temperature: ''
+      });
+
+      console.log(_this.state);
+
+      _this.findCity();
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "errorHandler", function (error) {
+      alert('error has occured');
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "getLocation", function () {
+      if (navigator.geolocation) {
+        var options = {
+          timeout: 60000
+        };
+        navigator.geolocation.getCurrentPosition(_this.setLocation, _this.errorHandler, options);
+      } else {
+        _this.setState({
+          lat: '',
+          lng: '',
+          canLocate: false,
+          city: '',
+          temperature: ''
+        });
+      }
+    });
+
+    return _this;
+  }
+
+  _createClass(Geolocation, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      this.getLocation();
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      if (!this.state.canLocate) {
+        return /*#__PURE__*/_react.default.createElement("div", null);
+      } else {
+        return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("hr", null), /*#__PURE__*/_react.default.createElement("p", null, "Current Location: ", this.state.city), /*#__PURE__*/_react.default.createElement("p", null, "Temperature: ", this.state.temp, " degrees Celcius."));
+      }
+    }
+  }]);
+
+  return Geolocation;
+}(_react.Component);
+
+var _default = Geolocation;
+exports.default = _default;
 },{"react":"../node_modules/react/index.js"}],"components/App.js":[function(require,module,exports) {
 "use strict";
 
@@ -24205,6 +24374,8 @@ var _Search = _interopRequireDefault(require("./Search"));
 var _City = _interopRequireDefault(require("./City"));
 
 var _Temperature = _interopRequireDefault(require("./Temperature"));
+
+var _Geolocation = _interopRequireDefault(require("./Geolocation"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -24236,12 +24407,6 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var WEATHER_API1 = 'https://api.openweathermap.org/data/2.5/weather?q='; // half of the api key
-
-var WEATHER_API2 = '&appid=fa7959c2fce14f00abc5fb86df87cf5a'; // second half of the api key
-
-var TEST_ADDRESS = 'http://api.openweathermap.org/data/2.5/weather?q=London&appid=fa7959c2fce14f00abc5fb86df87cf5a'; // debugging purposes
-
 var App = /*#__PURE__*/function (_Component) {
   _inherits(App, _Component);
 
@@ -24264,30 +24429,10 @@ var App = /*#__PURE__*/function (_Component) {
       type: null
     });
 
-    _defineProperty(_assertThisInitialized(_this), "invokeWeatherAPI", function (data) {
-      fetch("".concat(WEATHER_API1).concat(data.cityQuery).concat(WEATHER_API2)).then(function (response) {
-        return response.json();
-      }).then(function (json) {
-        var city = json.name;
-        var temperature = parseFloat(json.main.temp);
-        var type = data.type;
+    _defineProperty(_assertThisInitialized(_this), "getData", function (data) {
+      _this.setState(data);
 
-        if (type == 'f') {
-          temperature = temperature * 9 / 5 - 459.67;
-          type = 'Fahrenheit';
-        } else {
-          temperature -= 273.15;
-          type = 'Celcius';
-        }
-
-        temperature = temperature.toFixed(2);
-
-        _this.setState({
-          city: city,
-          temperature: temperature,
-          type: type
-        });
-      }); //.catch(err => alert("No city found"))
+      console.log(_this.state);
     });
 
     return _this;
@@ -24298,12 +24443,12 @@ var App = /*#__PURE__*/function (_Component) {
     value: function render() {
       console.log('this.state', this.state.type);
       return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("h2", null, "Temperature Finder"), /*#__PURE__*/_react.default.createElement(_Search.default, {
-        searchCity: this.invokeWeatherAPI
+        sendData: this.getData
       }), /*#__PURE__*/_react.default.createElement(_City.default, {
         city: this.state.city
       }), /*#__PURE__*/_react.default.createElement(_Temperature.default, {
         state: this.state
-      }));
+      }), /*#__PURE__*/_react.default.createElement(_Geolocation.default, null));
     }
   }]);
 
@@ -24312,7 +24457,7 @@ var App = /*#__PURE__*/function (_Component) {
 
 var _default = App;
 exports.default = _default;
-},{"react":"../node_modules/react/index.js","./Search":"components/Search.js","./City":"components/City.js","./Temperature":"components/Temperature.js"}],"../node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
+},{"react":"../node_modules/react/index.js","./Search":"components/Search.js","./City":"components/City.js","./Temperature":"components/Temperature.js","./Geolocation":"components/Geolocation.js"}],"../node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
 var bundleURL = null;
 
 function getBundleURLCached() {
@@ -24426,7 +24571,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50581" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59423" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

@@ -1,10 +1,38 @@
 import React, { Component } from 'react';
 
+    const WEATHER_API1 = 'https://api.openweathermap.org/data/2.5/weather?appid=fa7959c2fce14f00abc5fb86df87cf5a&q='
+    const TEST_ADDRESS = 'http://api.openweathermap.org/data/2.5/weather?appid=fa7959c2fce14f00abc5fb86df87cf5a&q=London' // debugging purposes
+
 class Search extends Component {
 
-    state = { cityQuery: '', type: 'f'}
+    state = { cityQuery: '', type: 'Fahrenheit'}
 
-    updateCityQuery = event => {
+    invokeWeatherAPI = (data) => {
+        fetch(`${WEATHER_API1}${this.state.cityQuery}`)
+        .then(response => response.json())
+        .then(json => {
+            const city = json.name;
+            var temperature = parseFloat(json.main.temp);
+            const type = data.type;
+
+            if(type == 'Fahrenheit'){
+                temperature = temperature * 9/5 - 459.67;
+            }
+            else{
+                temperature -= 273.15;
+            }
+            temperature = temperature.toFixed(2);
+
+            this.props.sendData({ city, temperature, type });
+        })
+        .catch(err => alert("No city found"))
+    }
+
+    searchCity = () => {
+        this.invokeWeatherAPI(this.state);
+    }
+
+    updateCityQuery = (event) => {
         this.setState({ cityQuery: event.target.value, type: this.state.type });
     }
 
@@ -12,16 +40,11 @@ class Search extends Component {
         this.setState( { cityQuery: this.state.cityQuery, type: document.getElementById("type").value});
     }
 
-    handleKeyPress = event => {
-        if(event.key == 'Enter'){
-            this.updateTypeQuery();
-            this.searchCity();  
-        }
-    }
-
-    searchCity = () => {
-        this.props.searchCity(this.state);
+    handleKeyPress = (event) => {
         console.log(this.state);
+        if(event.key == 'Enter'){
+            this.invokeWeatherAPI(this.state);
+        }
     }
 
     render() {
@@ -35,8 +58,8 @@ class Search extends Component {
                     placeholder='Search for a city'
                 />
                 <select name="temptype" id="type" onChange={this.updateTypeQuery}>
-                    <option value="f">Fahrenheit</option>
-                    <option value="c">Celsius</option>
+                    <option value="Fahrenheit">Fahrenheit</option>
+                    <option value="Celcius">Celsius</option>
                 </select>
 
                 <br></br>
