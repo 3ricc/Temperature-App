@@ -11,12 +11,9 @@ class App extends Component{
 
     getData = (data) => {
         this.setState(data);
-        console.log(this.state);
     }
 
     render(){
-
-        console.log('this.state' , this.state.type);
 
         return(
             <div>

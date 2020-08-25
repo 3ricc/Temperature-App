@@ -24140,8 +24140,6 @@ var Search = /*#__PURE__*/function (_Component) {
     });
 
     _defineProperty(_assertThisInitialized(_this), "handleKeyPress", function (event) {
-      console.log(_this.state);
-
       if (event.key == 'Enter') {
         _this.invokeWeatherAPI(_this.state);
       }
@@ -24276,7 +24274,7 @@ var Geolocation = /*#__PURE__*/function (_Component) {
     _defineProperty(_assertThisInitialized(_this), "state", {
       lat: '',
       lng: '',
-      canLocate: true,
+      canLocate: false,
       city: '',
       temp: ''
     });
@@ -24285,17 +24283,12 @@ var Geolocation = /*#__PURE__*/function (_Component) {
       fetch("".concat(API_ADDRESS1).concat(_this.state.lat, "&lon=").concat(_this.state.lng)).then(function (response) {
         return response.json();
       }).then(function (json) {
-        var city = json.name;
-        var temperature = parseFloat(json.main.temp);
-        temperature -= 273.15;
-        temperature = temperature.toFixed(2);
-
         _this.setState({
           lat: _this.state.lat,
           lng: _this.state.lng,
           canLocate: true,
-          city: city,
-          temp: temperature
+          city: json.name,
+          temp: (parseFloat(json.main.temp) - 273.15).toFixed(2)
         });
       });
     });
@@ -24314,9 +24307,7 @@ var Geolocation = /*#__PURE__*/function (_Component) {
       _this.findCity();
     });
 
-    _defineProperty(_assertThisInitialized(_this), "errorHandler", function (error) {
-      alert('error has occured');
-    });
+    _defineProperty(_assertThisInitialized(_this), "errorHandler", function (error) {});
 
     _defineProperty(_assertThisInitialized(_this), "getLocation", function () {
       if (navigator.geolocation) {
@@ -24347,7 +24338,7 @@ var Geolocation = /*#__PURE__*/function (_Component) {
     key: "render",
     value: function render() {
       if (!this.state.canLocate) {
-        return /*#__PURE__*/_react.default.createElement("div", null);
+        return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("hr", null), /*#__PURE__*/_react.default.createElement("p", null, "Location Sharing is Off."));
       } else {
         return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("hr", null), /*#__PURE__*/_react.default.createElement("p", null, "Current Location: ", this.state.city), /*#__PURE__*/_react.default.createElement("p", null, "Temperature: ", this.state.temp, " degrees Celcius."));
       }
@@ -24431,8 +24422,6 @@ var App = /*#__PURE__*/function (_Component) {
 
     _defineProperty(_assertThisInitialized(_this), "getData", function (data) {
       _this.setState(data);
-
-      console.log(_this.state);
     });
 
     return _this;
@@ -24441,7 +24430,6 @@ var App = /*#__PURE__*/function (_Component) {
   _createClass(App, [{
     key: "render",
     value: function render() {
-      console.log('this.state', this.state.type);
       return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("h2", null, "Temperature Finder"), /*#__PURE__*/_react.default.createElement(_Search.default, {
         sendData: this.getData
       }), /*#__PURE__*/_react.default.createElement(_City.default, {
@@ -24571,7 +24559,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59423" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56259" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

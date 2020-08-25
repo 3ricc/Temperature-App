@@ -4,21 +4,14 @@ const API_ADDRESS1 = 'https://api.openweathermap.org/data/2.5/weather?appid=fa79
 
 class Geolocation extends Component {
 
-    state = { lat: '', lng: '', canLocate: true, city: '', temp: ''}
+    state = { lat: '', lng: '', canLocate: false, city: '', temp: ''}
 
     findCity = () => {
         fetch(`${API_ADDRESS1}${this.state.lat}&lon=${this.state.lng}`)
         .then (response => response.json())
         .then(json =>{
 
-            const city = json.name;
-            var temperature = parseFloat(json.main.temp);
-
-            temperature -= 273.15;
-
-            temperature = temperature.toFixed(2);
-
-            this.setState({lat: this.state.lat, lng: this.state.lng, canLocate: true, city: city, temp: temperature})
+            this.setState({lat: this.state.lat, lng: this.state.lng, canLocate: true, city: json.name, temp: (parseFloat(json.main.temp) - 273.15).toFixed(2)})
 
         })
     }
@@ -34,7 +27,6 @@ class Geolocation extends Component {
     }
 
     errorHandler = (error) => {
-        alert('error has occured');
     }
 
 
@@ -52,7 +44,8 @@ class Geolocation extends Component {
         if (!this.state.canLocate){
             return (
                 <div>
-                    
+                    <hr></hr>
+                    <p>Location Sharing is Off.</p>
                 </div>
             )
         }

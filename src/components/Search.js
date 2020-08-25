@@ -41,7 +41,6 @@ class Search extends Component {
     }
 
     handleKeyPress = (event) => {
-        console.log(this.state);
         if(event.key == 'Enter'){
             this.invokeWeatherAPI(this.state);
         }
