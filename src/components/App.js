@@ -3,6 +3,7 @@ import Search from './Search';
 import City from './City';
 import Temperature from './Temperature';
 import Geolocation from './Geolocation';
+import Login from './Login';
 
 
 class App extends Component{
@@ -22,8 +23,11 @@ class App extends Component{
               <City city={this.state.city} />
               <Temperature state={this.state} />
               <Geolocation />
+              <Login />
             </div>
         );
+
+        
     }
 }
 
