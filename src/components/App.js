@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
 import Search from './Search';
-import City from './City';
-import Temperature from './Temperature';
+import CityInfo from './CityInfo';
 import Geolocation from './Geolocation';
 import Login from './Login';
 
 
 class App extends Component{
 
-    state = { city: null, temperature: null, type: null};
+    state = { city: null, temperature: null, type: null, weather: null, icon: null};
 
     getData = (data) => {
         this.setState(data);
@@ -20,8 +19,7 @@ class App extends Component{
             <div>
               <h2>Temperature Finder</h2>
               <Search sendData={this.getData} />
-              <City city={this.state.city} />
-              <Temperature state={this.state} />
+              <CityInfo state={this.state} />
               <Geolocation />
               <Login />
             </div>

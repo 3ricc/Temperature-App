@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
     const WEATHER_API1 = 'https://api.openweathermap.org/data/2.5/weather?appid=fa7959c2fce14f00abc5fb86df87cf5a&q='
     const TEST_ADDRESS = 'http://api.openweathermap.org/data/2.5/weather?appid=fa7959c2fce14f00abc5fb86df87cf5a&q=London' // debugging purposes
+    const WEATHER_ICON_ADDRESS = 'http://openweathermap.org/img/wn/'
 
 class Search extends Component {
 
@@ -14,6 +15,8 @@ class Search extends Component {
             const city = json.name;
             var temperature = parseFloat(json.main.temp);
             const type = data.type;
+            const weather = json.weather[0].main;
+            const icon = WEATHER_ICON_ADDRESS + json.weather[0].icon + '@2x.png';
 
             if(type == 'Fahrenheit'){
                 temperature = temperature * 9/5 - 459.67;
@@ -23,7 +26,7 @@ class Search extends Component {
             }
             temperature = temperature.toFixed(2);
 
-            this.props.sendData({ city, temperature, type });
+            this.props.sendData({ city, temperature, type, weather, icon });
         })
         .catch(err => alert("No city found"))
     }

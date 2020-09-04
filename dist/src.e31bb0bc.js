@@ -28326,6 +28326,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 var WEATHER_API1 = 'https://api.openweathermap.org/data/2.5/weather?appid=fa7959c2fce14f00abc5fb86df87cf5a&q=';
 var TEST_ADDRESS = 'http://api.openweathermap.org/data/2.5/weather?appid=fa7959c2fce14f00abc5fb86df87cf5a&q=London'; // debugging purposes
 
+var WEATHER_ICON_ADDRESS = 'http://openweathermap.org/img/wn/';
+
 var Search = /*#__PURE__*/function (_Component) {
   _inherits(Search, _Component);
 
@@ -28354,6 +28356,8 @@ var Search = /*#__PURE__*/function (_Component) {
         var city = json.name;
         var temperature = parseFloat(json.main.temp);
         var type = data.type;
+        var weather = json.weather[0].main;
+        var icon = WEATHER_ICON_ADDRESS + json.weather[0].icon + '@2x.png';
 
         if (type == 'Fahrenheit') {
           temperature = temperature * 9 / 5 - 459.67;
@@ -28366,7 +28370,9 @@ var Search = /*#__PURE__*/function (_Component) {
         _this.props.sendData({
           city: city,
           temperature: temperature,
-          type: type
+          type: type,
+          weather: weather,
+          icon: icon
         });
       }).catch(function (err) {
         return alert("No city found");
@@ -28426,7 +28432,7 @@ var Search = /*#__PURE__*/function (_Component) {
 
 var _default = Search;
 exports.default = _default;
-},{"react":"../node_modules/react/index.js"}],"components/City.js":[function(require,module,exports) {
+},{"react":"../node_modules/react/index.js"}],"components/CityInfo.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28438,34 +28444,16 @@ var _react = _interopRequireDefault(require("react"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var City = function City(_ref) {
-  var city = _ref.city;
-  if (!city) return null;
-  return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("h3", null, city));
-}; // one more time
-
-
-var _default = City;
-exports.default = _default;
-},{"react":"../node_modules/react/index.js"}],"components/Temperature.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _react = _interopRequireDefault(require("react"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var Temperature = function Temperature(_ref) {
+var CityInfo = function CityInfo(_ref) {
   var state = _ref.state;
   if (!state.temperature) return null;
-  return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("p", null, "Temperature is ", state.temperature, " degrees ", state.type, "."));
+  return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("h3", null, state.city), /*#__PURE__*/_react.default.createElement("img", {
+    className: "image2",
+    src: state.icon
+  }), /*#__PURE__*/_react.default.createElement("p", null, " Weather: ", state.weather, " "), /*#__PURE__*/_react.default.createElement("p", null, "Temperature is ", state.temperature, " degrees ", state.type, "."));
 };
 
-var _default = Temperature;
+var _default = CityInfo;
 exports.default = _default;
 },{"react":"../node_modules/react/index.js"}],"components/Geolocation.js":[function(require,module,exports) {
 "use strict";
@@ -28506,6 +28494,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var API_ADDRESS1 = 'https://api.openweathermap.org/data/2.5/weather?appid=fa7959c2fce14f00abc5fb86df87cf5a&lat=';
+var WEATHER_ICON_ADDRESS = 'http://openweathermap.org/img/wn/';
 
 var Geolocation = /*#__PURE__*/function (_Component) {
   _inherits(Geolocation, _Component);
@@ -28528,7 +28517,9 @@ var Geolocation = /*#__PURE__*/function (_Component) {
       lng: '',
       canLocate: false,
       city: '',
-      temp: ''
+      temp: '',
+      weather: '',
+      icon: ''
     });
 
     _defineProperty(_assertThisInitialized(_this), "findCity", function () {
@@ -28540,8 +28531,12 @@ var Geolocation = /*#__PURE__*/function (_Component) {
           lng: _this.state.lng,
           canLocate: true,
           city: json.name,
-          temp: (parseFloat(json.main.temp) - 273.15).toFixed(2)
+          temp: (parseFloat(json.main.temp) - 273.15).toFixed(2),
+          weather: json.weather[0].main,
+          icon: WEATHER_ICON_ADDRESS + json.weather[0].icon + '@2x.png'
         });
+
+        console.log(_this.state.icon);
       });
     });
 
@@ -28551,7 +28546,9 @@ var Geolocation = /*#__PURE__*/function (_Component) {
         lng: position.coords.longitude,
         canLocate: true,
         city: '',
-        temperature: ''
+        temperature: '',
+        weather: '',
+        icon: ''
       });
 
       console.log(_this.state);
@@ -28573,7 +28570,9 @@ var Geolocation = /*#__PURE__*/function (_Component) {
           lng: '',
           canLocate: false,
           city: '',
-          temperature: ''
+          temperature: '',
+          weather: '',
+          icon: ''
         });
       }
     });
@@ -28592,7 +28591,10 @@ var Geolocation = /*#__PURE__*/function (_Component) {
       if (!this.state.canLocate) {
         return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("hr", null), /*#__PURE__*/_react.default.createElement("p", null, "Location Sharing is Off."));
       } else {
-        return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("hr", null), /*#__PURE__*/_react.default.createElement("p", null, "Current Location: ", this.state.city), /*#__PURE__*/_react.default.createElement("p", null, "Temperature: ", this.state.temp, " degrees Celcius."));
+        return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("hr", null), /*#__PURE__*/_react.default.createElement("h4", null, /*#__PURE__*/_react.default.createElement("p", null, "Current Location: ", this.state.city), /*#__PURE__*/_react.default.createElement("p", null, "Temperature: ", this.state.temp, " degrees Celcius."), /*#__PURE__*/_react.default.createElement("img", {
+          src: this.state.icon,
+          alt: "weather-icon"
+        }), /*#__PURE__*/_react.default.createElement("p", null, "Weather: ", this.state.weather)));
       }
     }
   }]);
@@ -28700,9 +28702,7 @@ var _react = _interopRequireWildcard(require("react"));
 
 var _Search = _interopRequireDefault(require("./Search"));
 
-var _City = _interopRequireDefault(require("./City"));
-
-var _Temperature = _interopRequireDefault(require("./Temperature"));
+var _CityInfo = _interopRequireDefault(require("./CityInfo"));
 
 var _Geolocation = _interopRequireDefault(require("./Geolocation"));
 
@@ -28757,7 +28757,9 @@ var App = /*#__PURE__*/function (_Component) {
     _defineProperty(_assertThisInitialized(_this), "state", {
       city: null,
       temperature: null,
-      type: null
+      type: null,
+      weather: null,
+      icon: null
     });
 
     _defineProperty(_assertThisInitialized(_this), "getData", function (data) {
@@ -28772,9 +28774,7 @@ var App = /*#__PURE__*/function (_Component) {
     value: function render() {
       return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("h2", null, "Temperature Finder"), /*#__PURE__*/_react.default.createElement(_Search.default, {
         sendData: this.getData
-      }), /*#__PURE__*/_react.default.createElement(_City.default, {
-        city: this.state.city
-      }), /*#__PURE__*/_react.default.createElement(_Temperature.default, {
+      }), /*#__PURE__*/_react.default.createElement(_CityInfo.default, {
         state: this.state
       }), /*#__PURE__*/_react.default.createElement(_Geolocation.default, null), /*#__PURE__*/_react.default.createElement(_Login.default, null));
     }
@@ -28785,7 +28785,7 @@ var App = /*#__PURE__*/function (_Component) {
 
 var _default = App;
 exports.default = _default;
-},{"react":"../node_modules/react/index.js","./Search":"components/Search.js","./City":"components/City.js","./Temperature":"components/Temperature.js","./Geolocation":"components/Geolocation.js","./Login":"components/Login.js"}],"../node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
+},{"react":"../node_modules/react/index.js","./Search":"components/Search.js","./CityInfo":"components/CityInfo.js","./Geolocation":"components/Geolocation.js","./Login":"components/Login.js"}],"../node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
 var bundleURL = null;
 
 function getBundleURLCached() {
@@ -28899,7 +28899,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63039" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53032" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
